@@ -14,6 +14,7 @@ import {
   TrendingUp,
   Clock,
   Code2,
+  Trash2,
 } from 'lucide-react';
 import type { NeetcodeStats, Difficulty } from '@/types/neetcode';
 
@@ -23,7 +24,7 @@ interface NeetcodeDashboardProps {
 }
 
 export default function NeetcodeDashboard({ onStartPractice, onViewRoadmap }: NeetcodeDashboardProps) {
-  const { progress, currentPosition, sessionHistory, activeSession } = useNeetcodeStore();
+  const { progress, currentPosition, sessionHistory, activeSession, deleteSessionHistoryEntry, clearSessionHistory } = useNeetcodeStore();
 
   const stats: NeetcodeStats = useMemo(() => {
     const progressValues = Object.values(progress);
@@ -225,7 +226,21 @@ export default function NeetcodeDashboard({ onStartPractice, onViewRoadmap }: Ne
 
       {/* Recent Activity */}
       <div className="bg-white dark:bg-zinc-900 rounded-xl border dark:border-zinc-800 shadow-sm p-6">
-        <h3 className="text-lg font-semibold mb-4">Recent Activity</h3>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold">Recent Activity</h3>
+          {recentSessions.length > 0 && (
+            <button
+              onClick={() => {
+                if (window.confirm('Clear all session history?')) {
+                  clearSessionHistory();
+                }
+              }}
+              className="text-xs text-zinc-400 hover:text-red-500 transition-colors"
+            >
+              Clear all
+            </button>
+          )}
+        </div>
         {recentSessions.length === 0 ? (
           <div className="text-center py-8 text-zinc-400">
             <Clock size={32} className="mx-auto mb-2 opacity-50" />
@@ -247,9 +262,22 @@ export default function NeetcodeDashboard({ onStartPractice, onViewRoadmap }: Ne
                     </p>
                   </div>
                 </div>
-                <div className="text-right">
-                  <p className="text-sm font-medium">{session.problemsCompleted}/{session.problemsAttempted}</p>
-                  <p className="text-xs text-zinc-400">problems</p>
+                <div className="flex items-center gap-3">
+                  <div className="text-right">
+                    <p className="text-sm font-medium">{session.problemsCompleted}/{session.problemsAttempted}</p>
+                    <p className="text-xs text-zinc-400">problems</p>
+                  </div>
+                  <button
+                    onClick={() => {
+                      if (window.confirm('Delete this practice session entry?')) {
+                        deleteSessionHistoryEntry(session.id);
+                      }
+                    }}
+                    className="p-1.5 text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors"
+                    title="Delete session log"
+                  >
+                    <Trash2 size={14} />
+                  </button>
                 </div>
               </div>
             ))}

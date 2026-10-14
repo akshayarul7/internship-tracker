@@ -81,8 +81,30 @@ export interface NeetcodeStoreActions {
   // Update current roadmap position
   updatePosition: (position: number) => void;
 
-  // Get or create progress for a problem
-  getProgress: (problemId: string) => ProblemProgress;
+  // Update an existing attempt
+  updateAttempt: (
+    problemId: string,
+    attemptId: string,
+    updates: {
+      outcome?: AttemptOutcome;
+      recallRating?: RecallRating;
+      notes?: string;
+      timeSpentMinutes?: number;
+      timestamp?: string;
+    }
+  ) => void;
+
+  // Delete an existing attempt
+  deleteAttempt: (problemId: string, attemptId: string) => void;
+
+  // Set or update completion date for a problem
+  setCompletedDate: (problemId: string, date: string | undefined) => void;
+
+  // Delete a practice session from history
+  deleteSessionHistoryEntry: (sessionId: string) => void;
+
+  // Clear all practice session history
+  clearSessionHistory: () => void;
 
   // Reset all progress (careful!)
   resetAllProgress: () => void;
@@ -127,6 +149,101 @@ const DEFAULT_REACTIVATION_CONFIG: ReactivationConfig = {
   inactivityThresholdDays: 14,
   diagnosticProblemCount: 8,
 };
+
+/**
+ * Recalculates problem flags, dates, and review scheduling when attempts change.
+ */
+function recalculateProgress(
+  problemId: string,
+  existing: ProblemProgress,
+  config: SpacedRepetitionConfig
+): ProblemProgress {
+  const attempts = existing.attempts || [];
+  const reviews = existing.reviews || [];
+
+  const hasAttempted = attempts.length > 0;
+  const hasSolvedIndependently = attempts.some(
+    (a) => a.outcome === 'solved_independently'
+  );
+  const hasSolvedWithHints = attempts.some(
+    (a) => a.outcome === 'solved_with_hints'
+  );
+  const hasSolutionViewed = attempts.some(
+    (a) => a.outcome === 'solution_viewed'
+  );
+
+  // Chronologically sort attempts
+  const sortedAttempts = [...attempts].sort(
+    (a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+  );
+
+  const firstAttemptDate = sortedAttempts.length > 0 ? sortedAttempts[0].timestamp : undefined;
+  const lastAttemptDate =
+    sortedAttempts.length > 0
+      ? sortedAttempts[sortedAttempts.length - 1].timestamp
+      : undefined;
+
+  // Latest recall rating
+  const lastAttemptWithRecall = [...sortedAttempts]
+    .reverse()
+    .find((a) => a.recallRating !== undefined);
+  const lastReview = reviews.length > 0 ? reviews[reviews.length - 1] : undefined;
+
+  let lastRecallRating: RecallRating | undefined = undefined;
+  let nextReviewDate = existing.nextReviewDate;
+  let needsReview = existing.needsReview;
+
+  if (lastReview) {
+    lastRecallRating = lastReview.recallRating;
+    nextReviewDate = calculateNextReviewDate(
+      lastRecallRating,
+      config,
+      new Date(lastReview.timestamp)
+    );
+    needsReview = lastRecallRating < 3;
+  } else if (lastAttemptWithRecall?.recallRating) {
+    lastRecallRating = lastAttemptWithRecall.recallRating;
+    nextReviewDate = calculateNextReviewDate(
+      lastRecallRating,
+      config,
+      new Date(lastAttemptWithRecall.timestamp)
+    );
+    needsReview = lastRecallRating < 3;
+  } else if (!hasAttempted) {
+    nextReviewDate = undefined;
+    needsReview = false;
+  }
+
+  // Update completed date
+  let completedDate = existing.completedDate;
+  if (!hasSolvedIndependently && !hasSolvedWithHints) {
+    completedDate = undefined;
+  } else if (!completedDate) {
+    const solvedAttempt = [...sortedAttempts]
+      .reverse()
+      .find(
+        (a) =>
+          a.outcome === 'solved_independently' ||
+          a.outcome === 'solved_with_hints'
+      );
+    if (solvedAttempt) completedDate = solvedAttempt.timestamp;
+  }
+
+  return {
+    ...existing,
+    hasAttempted,
+    hasSolvedIndependently,
+    hasSolvedWithHints,
+    hasSolutionViewed,
+    needsReview,
+    lastRecallRating,
+    nextReviewDate,
+    completedDate,
+    firstAttemptDate,
+    lastAttemptDate,
+    attempts: sortedAttempts,
+  };
+}
 
 export const useNeetcodeStore = create<NeetcodeStoreState>()(
   persist(
@@ -520,7 +637,7 @@ export const useNeetcodeStore = create<NeetcodeStoreState>()(
         });
       },
 
-      getProgress: (problemId) => {
+      getProgress: (problemId: string) => {
         const current = get().progress[problemId];
         if (current) return current;
         const initial = createDefaultProgress(problemId);
@@ -531,6 +648,108 @@ export const useNeetcodeStore = create<NeetcodeStoreState>()(
           },
         }));
         return initial;
+      },
+
+      updateAttempt: (problemId, attemptId, updates) => {
+        set((state) => {
+          const existing = state.progress[problemId];
+          if (!existing) return state;
+
+          const attempts = (existing.attempts || []).map((att) => {
+            if (att.id !== attemptId) return att;
+            let timestamp = att.timestamp;
+            if (updates.timestamp) {
+              timestamp = updates.timestamp.includes('T')
+                ? updates.timestamp
+                : `${updates.timestamp}T12:00:00.000Z`;
+            }
+            return {
+              ...att,
+              outcome: updates.outcome ?? att.outcome,
+              recallRating:
+                updates.recallRating !== undefined
+                  ? updates.recallRating
+                  : att.recallRating,
+              notes: updates.notes !== undefined ? updates.notes : att.notes,
+              timeSpentMinutes:
+                updates.timeSpentMinutes !== undefined
+                  ? updates.timeSpentMinutes
+                  : att.timeSpentMinutes,
+              timestamp,
+            };
+          });
+
+          const updatedProg = recalculateProgress(
+            problemId,
+            { ...existing, attempts },
+            state.spacedRepetitionConfig
+          );
+
+          return {
+            progress: {
+              ...state.progress,
+              [problemId]: updatedProg,
+            },
+            lastActivityDate: new Date().toISOString(),
+          };
+        });
+      },
+
+      deleteAttempt: (problemId, attemptId) => {
+        set((state) => {
+          const existing = state.progress[problemId];
+          if (!existing) return state;
+
+          const attempts = (existing.attempts || []).filter(
+            (att) => att.id !== attemptId
+          );
+
+          const updatedProg = recalculateProgress(
+            problemId,
+            { ...existing, attempts },
+            state.spacedRepetitionConfig
+          );
+
+          return {
+            progress: {
+              ...state.progress,
+              [problemId]: updatedProg,
+            },
+            lastActivityDate: new Date().toISOString(),
+          };
+        });
+      },
+
+      setCompletedDate: (problemId, date) => {
+        const nowIso = new Date().toISOString();
+        set((state) => {
+          const existing =
+            state.progress[problemId] ?? createDefaultProgress(problemId);
+          let formattedDate: string | undefined = undefined;
+          if (date) {
+            formattedDate = date.includes('T') ? date : `${date}T12:00:00.000Z`;
+          }
+          return {
+            progress: {
+              ...state.progress,
+              [problemId]: {
+                ...existing,
+                completedDate: formattedDate,
+              },
+            },
+            lastActivityDate: nowIso,
+          };
+        });
+      },
+
+      deleteSessionHistoryEntry: (sessionId) => {
+        set((state) => ({
+          sessionHistory: state.sessionHistory.filter((s) => s.id !== sessionId),
+        }));
+      },
+
+      clearSessionHistory: () => {
+        set({ sessionHistory: [] });
       },
 
       resetAllProgress: () => {

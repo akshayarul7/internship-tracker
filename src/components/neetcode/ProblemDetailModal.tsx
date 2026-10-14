@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useNeetcodeStore } from '@/store/useNeetcodeStore';
-import type { NeetcodeProblem } from '@/types/neetcode';
+import type { NeetcodeProblem, AttemptOutcome, RecallRating, AttemptRecord } from '@/types/neetcode';
 import { getRecallDescription } from '@/lib/neetcode/scheduling';
 import {
   X,
@@ -16,6 +16,9 @@ import {
   Save,
   Brain,
   Calendar,
+  Pencil,
+  Trash2,
+  Check,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -24,6 +27,13 @@ interface ProblemDetailModalProps {
   onClose: () => void;
   onLogAttempt: () => void;
 }
+
+const outcomeOptions: { value: AttemptOutcome; label: string; color: string }[] = [
+  { value: 'solved_independently', label: 'Solved Independently', color: 'bg-green-500' },
+  { value: 'solved_with_hints', label: 'Solved with Hints', color: 'bg-blue-500' },
+  { value: 'attempted', label: 'Attempted', color: 'bg-orange-500' },
+  { value: 'solution_viewed', label: 'Solution Viewed', color: 'bg-amber-500' },
+];
 
 export default function ProblemDetailModal({ problem, onClose, onLogAttempt }: ProblemDetailModalProps) {
   const store = useNeetcodeStore();
@@ -39,6 +49,20 @@ export default function ProblemDetailModal({ problem, onClose, onLogAttempt }: P
     prog?.completedDate ? prog.completedDate.split('T')[0] : ''
   );
 
+  // Direct completed date editing
+  const [isEditingCompletedDate, setIsEditingCompletedDate] = useState(false);
+  const [directCompletedDate, setDirectCompletedDate] = useState(
+    prog?.completedDate ? prog.completedDate.split('T')[0] : ''
+  );
+
+  // Attempt editing state
+  const [editingAttemptId, setEditingAttemptId] = useState<string | null>(null);
+  const [editOutcome, setEditOutcome] = useState<AttemptOutcome>('solved_independently');
+  const [editRecall, setEditRecall] = useState<RecallRating | undefined>(undefined);
+  const [editTimestamp, setEditTimestamp] = useState('');
+  const [editTimeSpent, setEditTimeSpent] = useState('');
+  const [editNotes, setEditNotes] = useState('');
+
   const handleSaveNotes = () => {
     store.updateProblemNotes(problem.id, {
       personalNotes,
@@ -49,6 +73,41 @@ export default function ProblemDetailModal({ problem, onClose, onLogAttempt }: P
       completedDate: completedDate || undefined,
     });
     setEditing(false);
+  };
+
+  const handleSaveCompletedDate = () => {
+    store.setCompletedDate(problem.id, directCompletedDate || undefined);
+    setIsEditingCompletedDate(false);
+    setCompletedDate(directCompletedDate);
+  };
+
+  const handleStartEditAttempt = (att: AttemptRecord) => {
+    setEditingAttemptId(att.id);
+    setEditOutcome(att.outcome);
+    setEditRecall(att.recallRating);
+    setEditTimestamp(att.timestamp ? att.timestamp.split('T')[0] : new Date().toISOString().split('T')[0]);
+    setEditTimeSpent(att.timeSpentMinutes !== undefined ? String(att.timeSpentMinutes) : '');
+    setEditNotes(att.notes || '');
+  };
+
+  const handleSaveAttemptEdit = (attemptId: string) => {
+    store.updateAttempt(problem.id, attemptId, {
+      outcome: editOutcome,
+      recallRating: editRecall,
+      timestamp: editTimestamp,
+      timeSpentMinutes: editTimeSpent ? parseInt(editTimeSpent, 10) : undefined,
+      notes: editNotes,
+    });
+    setEditingAttemptId(null);
+  };
+
+  const handleDeleteAttempt = (attemptId: string) => {
+    if (window.confirm('Are you sure you want to delete this attempt record? Your problem progress and solve status will be recalculated.')) {
+      store.deleteAttempt(problem.id, attemptId);
+      if (editingAttemptId === attemptId) {
+        setEditingAttemptId(null);
+      }
+    }
   };
 
   const getDifficultyColor = (d: string) => {
@@ -144,29 +203,108 @@ export default function ProblemDetailModal({ problem, onClose, onLogAttempt }: P
             </div>
           )}
 
-          {/* Dates */}
-          {(prog?.firstAttemptDate || prog?.completedDate) && (
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
-              {prog.completedDate && (
-                <div className="flex items-center gap-2 text-green-600 dark:text-green-400 font-medium">
-                  <CheckCircle size={14} />
-                  <span>Completed: {new Date(prog.completedDate).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}</span>
-                </div>
-              )}
-              {prog.firstAttemptDate && (
-                <div className="flex items-center gap-2 text-zinc-500">
-                  <Clock size={14} />
-                  <span>First attempt: {new Date(prog.firstAttemptDate).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}</span>
-                </div>
-              )}
-              {prog.lastAttemptDate && (
-                <div className="flex items-center gap-2 text-zinc-500">
-                  <Clock size={14} />
-                  <span>Last attempt: {new Date(prog.lastAttemptDate).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}</span>
-                </div>
-              )}
+          {/* Dates & Completion */}
+          <div className="bg-zinc-50 dark:bg-zinc-800/40 rounded-lg p-3 space-y-2 border border-zinc-100 dark:border-zinc-800/60">
+            <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
+              <div className="flex items-center gap-2">
+                {isEditingCompletedDate ? (
+                  <div className="flex items-center gap-2">
+                    <Calendar size={14} className="text-blue-500" />
+                    <span className="text-xs font-medium text-zinc-700 dark:text-zinc-300">Completed Date:</span>
+                    <input
+                      type="date"
+                      value={directCompletedDate}
+                      onChange={(e) => setDirectCompletedDate(e.target.value)}
+                      className="px-2 py-1 text-xs border rounded dark:bg-zinc-800 dark:border-zinc-700 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleSaveCompletedDate}
+                      className="p-1 text-green-600 hover:bg-green-100 dark:hover:bg-green-900/30 rounded"
+                      title="Save date"
+                    >
+                      <Check size={14} />
+                    </button>
+                    {prog?.completedDate && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setDirectCompletedDate('');
+                          store.setCompletedDate(problem.id, undefined);
+                          setIsEditingCompletedDate(false);
+                          setCompletedDate('');
+                        }}
+                        className="p-1 text-red-500 hover:bg-red-100 dark:hover:bg-red-900/30 rounded"
+                        title="Clear completed date"
+                      >
+                        <Trash2 size={13} />
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsEditingCompletedDate(false);
+                        setDirectCompletedDate(prog?.completedDate ? prog.completedDate.split('T')[0] : '');
+                      }}
+                      className="p-1 text-zinc-400 hover:text-zinc-600 rounded"
+                      title="Cancel"
+                    >
+                      <X size={14} />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    {prog?.completedDate ? (
+                      <div className="flex items-center gap-2 text-green-600 dark:text-green-400 font-medium text-xs sm:text-sm">
+                        <CheckCircle size={15} />
+                        <span>Completed: {new Date(prog.completedDate).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}</span>
+                      </div>
+                    ) : (prog?.hasSolvedIndependently || prog?.hasSolvedWithHints) ? (
+                      <div className="flex items-center gap-2 text-zinc-500 text-xs sm:text-sm">
+                        <CheckCircle size={15} className="text-green-500" />
+                        <span>Completed (date not set)</span>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2 text-zinc-400 text-xs sm:text-sm">
+                        <Calendar size={14} />
+                        <span>Not solved yet</span>
+                      </div>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setDirectCompletedDate(
+                          prog?.completedDate
+                            ? prog.completedDate.split('T')[0]
+                            : new Date().toISOString().split('T')[0]
+                        );
+                        setIsEditingCompletedDate(true);
+                      }}
+                      className="inline-flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400 hover:underline ml-1 font-normal"
+                    >
+                      <Pencil size={11} />
+                      {prog?.completedDate ? 'Edit date' : 'Set date'}
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex items-center gap-3 text-xs text-zinc-400">
+                {prog?.firstAttemptDate && (
+                  <span className="flex items-center gap-1">
+                    <Clock size={12} />
+                    First: {new Date(prog.firstAttemptDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                  </span>
+                )}
+                {prog?.lastAttemptDate && (
+                  <span className="flex items-center gap-1">
+                    <Clock size={12} />
+                    Last: {new Date(prog.lastAttemptDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                  </span>
+                )}
+              </div>
             </div>
-          )}
+          </div>
 
           {/* Notes Section */}
           <div className="border dark:border-zinc-800 rounded-lg">
@@ -279,26 +417,209 @@ export default function ProblemDetailModal({ problem, onClose, onLogAttempt }: P
           {prog?.attempts && prog.attempts.length > 0 && (
             <div>
               <h3 className="font-medium text-sm mb-3">Attempt History ({prog.attempts.length})</h3>
-              <div className="space-y-2 max-h-48 overflow-y-auto">
-                {[...prog.attempts].reverse().map((attempt) => (
-                  <div key={attempt.id} className="flex items-center justify-between text-sm py-2 border-b dark:border-zinc-800 last:border-0">
-                    <div className="flex items-center gap-2">
-                      <span className={cn(
-                        'w-2 h-2 rounded-full',
-                        attempt.outcome === 'solved_independently' ? 'bg-green-500' :
-                        attempt.outcome === 'solved_with_hints' ? 'bg-blue-500' :
-                        attempt.outcome === 'attempted' ? 'bg-orange-500' : 'bg-amber-500'
-                      )} />
-                      <span className="capitalize">{attempt.outcome.replace(/_/g, ' ')}</span>
-                      {attempt.recallRating && (
-                        <span className="text-zinc-400 text-xs">• Recall: {attempt.recallRating}/4</span>
+              <div className="space-y-3 max-h-72 overflow-y-auto">
+                {[...prog.attempts].reverse().map((attempt) => {
+                  const isEditingThis = editingAttemptId === attempt.id;
+
+                  if (isEditingThis) {
+                    return (
+                      <div
+                        key={attempt.id}
+                        className="p-3.5 bg-zinc-50 dark:bg-zinc-800/70 rounded-lg border dark:border-zinc-700 space-y-3 shadow-sm"
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-semibold text-zinc-700 dark:text-zinc-200">
+                            Edit Attempt
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => setEditingAttemptId(null)}
+                            className="text-xs text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+
+                        {/* Outcome selection */}
+                        <div>
+                          <label className="text-xs font-medium text-zinc-500 block mb-1.5">Outcome</label>
+                          <div className="grid grid-cols-2 gap-1.5">
+                            {outcomeOptions.map((opt) => (
+                              <button
+                                key={opt.value}
+                                type="button"
+                                onClick={() => setEditOutcome(opt.value)}
+                                className={cn(
+                                  'text-xs py-1.5 px-2 rounded-lg border text-left flex items-center gap-1.5 font-medium transition-colors',
+                                  editOutcome === opt.value
+                                    ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'
+                                    : 'border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800'
+                                )}
+                              >
+                                <span className={cn('w-2 h-2 rounded-full', opt.color)} />
+                                <span className="truncate">{opt.label}</span>
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Recall rating */}
+                        <div>
+                          <label className="text-xs font-medium text-zinc-500 block mb-1.5">Recall Rating</label>
+                          <div className="grid grid-cols-5 gap-1 text-xs">
+                            <button
+                              type="button"
+                              onClick={() => setEditRecall(undefined)}
+                              className={cn(
+                                'py-1 rounded-lg border',
+                                editRecall === undefined
+                                  ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/30 font-semibold text-blue-700 dark:text-blue-300'
+                                  : 'border-zinc-200 dark:border-zinc-700 text-zinc-500'
+                              )}
+                            >
+                              None
+                            </button>
+                            {([1, 2, 3, 4] as RecallRating[]).map((r) => (
+                              <button
+                                key={r}
+                                type="button"
+                                onClick={() => setEditRecall(r)}
+                                className={cn(
+                                  'py-1 rounded-lg border',
+                                  editRecall === r
+                                    ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/30 font-semibold text-blue-600 dark:text-blue-300'
+                                    : 'border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-300'
+                                )}
+                              >
+                                {r} {r === 1 ? '— F' : r === 2 ? '— W' : r === 3 ? '— G' : '— S'}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Date & Time Spent */}
+                        <div className="grid grid-cols-2 gap-2">
+                          <div>
+                            <label className="text-xs font-medium text-zinc-500 block mb-1">Date</label>
+                            <input
+                              type="date"
+                              value={editTimestamp}
+                              onChange={(e) => setEditTimestamp(e.target.value)}
+                              className="w-full px-2 py-1 text-xs border rounded-lg dark:bg-zinc-800 dark:border-zinc-700 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-xs font-medium text-zinc-500 block mb-1">Time Spent (min)</label>
+                            <input
+                              type="number"
+                              min="0"
+                              placeholder="e.g. 25"
+                              value={editTimeSpent}
+                              onChange={(e) => setEditTimeSpent(e.target.value)}
+                              className="w-full px-2 py-1 text-xs border rounded-lg dark:bg-zinc-800 dark:border-zinc-700 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                            />
+                          </div>
+                        </div>
+
+                        {/* Notes */}
+                        <div>
+                          <label className="text-xs font-medium text-zinc-500 block mb-1">Attempt Notes</label>
+                          <textarea
+                            value={editNotes}
+                            onChange={(e) => setEditNotes(e.target.value)}
+                            placeholder="Notes about this specific attempt..."
+                            className="w-full px-2 py-1 text-xs border rounded-lg dark:bg-zinc-800 dark:border-zinc-700 focus:outline-none focus:ring-1 focus:ring-blue-500 min-h-[50px]"
+                          />
+                        </div>
+
+                        {/* Action buttons */}
+                        <div className="flex justify-end gap-2 pt-1">
+                          <button
+                            type="button"
+                            onClick={() => setEditingAttemptId(null)}
+                            className="px-2.5 py-1 text-xs border rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 dark:border-zinc-700"
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleSaveAttemptEdit(attempt.id)}
+                            className="px-2.5 py-1 text-xs bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium"
+                          >
+                            Save Changes
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  }
+
+                  return (
+                    <div
+                      key={attempt.id}
+                      className="py-2.5 px-3 rounded-lg border border-zinc-100 dark:border-zinc-800/80 hover:bg-zinc-50 dark:hover:bg-zinc-800/40 transition-colors"
+                    >
+                      <div className="flex items-center justify-between text-sm">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span
+                            className={cn(
+                              'w-2 h-2 rounded-full',
+                              attempt.outcome === 'solved_independently'
+                                ? 'bg-green-500'
+                                : attempt.outcome === 'solved_with_hints'
+                                ? 'bg-blue-500'
+                                : attempt.outcome === 'attempted'
+                                ? 'bg-orange-500'
+                                : 'bg-amber-500'
+                            )}
+                          />
+                          <span className="capitalize font-medium text-xs sm:text-sm">
+                            {attempt.outcome.replace(/_/g, ' ')}
+                          </span>
+                          {attempt.recallRating && (
+                            <span className="text-zinc-500 dark:text-zinc-400 text-xs">
+                              • Recall: {attempt.recallRating}/4 ({getRecallDescription(attempt.recallRating)})
+                            </span>
+                          )}
+                          {attempt.timeSpentMinutes !== undefined && (
+                            <span className="text-zinc-400 text-xs">
+                              • {attempt.timeSpentMinutes}m
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-1.5 ml-2 shrink-0">
+                          <span className="text-xs text-zinc-400 mr-1">
+                            {new Date(attempt.timestamp).toLocaleDateString(undefined, {
+                              year: 'numeric',
+                              month: 'short',
+                              day: 'numeric',
+                            })}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => handleStartEditAttempt(attempt)}
+                            title="Edit attempt"
+                            className="p-1 text-zinc-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-950/30 rounded transition-colors"
+                          >
+                            <Pencil size={13} />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteAttempt(attempt.id)}
+                            title="Delete attempt"
+                            className="p-1 text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 rounded transition-colors"
+                          >
+                            <Trash2 size={13} />
+                          </button>
+                        </div>
+                      </div>
+                      {attempt.notes && (
+                        <p className="mt-1.5 text-xs text-zinc-500 dark:text-zinc-400 pl-3 border-l-2 border-zinc-200 dark:border-zinc-700 whitespace-pre-wrap">
+                          {attempt.notes}
+                        </p>
                       )}
                     </div>
-                    <span className="text-xs text-zinc-400">
-                      {new Date(attempt.timestamp).toLocaleDateString()}
-                    </span>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           )}
