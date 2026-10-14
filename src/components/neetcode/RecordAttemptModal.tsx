@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useNeetcodeStore } from '@/store/useNeetcodeStore';
 import type { AttemptOutcome, RecallRating, NeetcodeProblem } from '@/types/neetcode';
 import { getRecallDescription, getIntervalDescription } from '@/lib/neetcode/scheduling';
-import { X, ExternalLink, CheckCircle, HelpCircle, AlertCircle, Eye } from 'lucide-react';
+import { X, ExternalLink, CheckCircle, HelpCircle, AlertCircle, Eye, Calendar, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface RecordAttemptModalProps {
@@ -33,6 +33,7 @@ export default function RecordAttemptModal({ problem, onClose, sessionMode, onRe
 
   const [outcome, setOutcome] = useState<AttemptOutcome | null>(null);
   const [recallRating, setRecallRating] = useState<RecallRating | null>(null);
+  const [completedDate, setCompletedDate] = useState(() => new Date().toISOString().split('T')[0]);
   const [notes, setNotes] = useState('');
   const [timeSpent, setTimeSpent] = useState('');
 
@@ -43,7 +44,8 @@ export default function RecordAttemptModal({ problem, onClose, sessionMode, onRe
       outcome,
       recallRating ?? undefined,
       notes || undefined,
-      timeSpent ? parseInt(timeSpent) : undefined
+      timeSpent ? parseInt(timeSpent) : undefined,
+      completedDate
     );
     onRecorded?.(problem.id);
     onClose();
@@ -132,17 +134,35 @@ export default function RecordAttemptModal({ problem, onClose, sessionMode, onRe
             )}
           </div>
 
-          {/* Time Spent */}
-          <div>
-            <label className="text-sm font-medium mb-1 block">Time Spent (minutes)</label>
-            <input
-              type="number"
-              min="0"
-              value={timeSpent}
-              onChange={(e) => setTimeSpent(e.target.value)}
-              placeholder="e.g. 25"
-              className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-800 dark:border-zinc-700 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-            />
+          {/* Date & Time Spent */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="text-sm font-medium mb-1 block flex items-center gap-1.5">
+                <Calendar size={14} className="text-zinc-500 dark:text-zinc-400" />
+                <span>Date Completed / Attempted</span>
+              </label>
+              <input
+                type="date"
+                value={completedDate}
+                onChange={(e) => setCompletedDate(e.target.value)}
+                className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-800 dark:border-zinc-700 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+              />
+            </div>
+
+            <div>
+              <label className="text-sm font-medium mb-1 block flex items-center gap-1.5">
+                <Clock size={14} className="text-zinc-500 dark:text-zinc-400" />
+                <span>Time Spent (minutes)</span>
+              </label>
+              <input
+                type="number"
+                min="0"
+                value={timeSpent}
+                onChange={(e) => setTimeSpent(e.target.value)}
+                placeholder="e.g. 25"
+                className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-800 dark:border-zinc-700 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+              />
+            </div>
           </div>
 
           {/* Notes */}

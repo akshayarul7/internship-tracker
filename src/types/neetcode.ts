@@ -163,6 +163,8 @@ export interface ProblemProgress {
   spaceComplexity?: string;
 
   // Dates (all ISO date strings)
+  /** Date when the problem was solved */
+  completedDate?: string;
   /** Date when the problem was first attempted */
   firstAttemptDate?: string;
   /** Date of the most recent attempt */

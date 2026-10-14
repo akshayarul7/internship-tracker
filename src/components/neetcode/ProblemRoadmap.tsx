@@ -251,6 +251,11 @@ export default function ProblemRoadmap() {
                             {problem.difficulty}
                           </span>
                           {getReviewBadge(problem.id)}
+                          {prog?.completedDate && (
+                            <span className="text-xs text-zinc-400 hidden xl:inline">
+                              Completed: {new Date(prog.completedDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                            </span>
+                          )}
                           {prog?.lastRecallRating && (
                             <span className="text-xs text-zinc-400 hidden lg:inline">
                               Recall: {getRecallDescription(prog.lastRecallRating)}

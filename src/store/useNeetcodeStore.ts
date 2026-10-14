@@ -25,7 +25,8 @@ export interface NeetcodeStoreActions {
     outcome: AttemptOutcome,
     recallRating?: RecallRating,
     notes?: string,
-    timeSpentMinutes?: number
+    timeSpentMinutes?: number,
+    completedDate?: string
   ) => void;
 
   // Record a review of a problem
@@ -44,6 +45,7 @@ export interface NeetcodeStoreActions {
       timeComplexity?: string;
       spaceComplexity?: string;
       understandsPattern?: boolean;
+      completedDate?: string;
     }
   ) => void;
 
@@ -141,9 +143,17 @@ export const useNeetcodeStore = create<NeetcodeStoreState>()(
       dailyPracticeConfig: DEFAULT_DAILY_PRACTICE_CONFIG,
       reactivationConfig: DEFAULT_REACTIVATION_CONFIG,
 
-      // Actions
-      recordAttempt: (problemId, outcome, recallRating, notes, timeSpentMinutes) => {
-        const nowIso = new Date().toISOString();
+      recordAttempt: (problemId, outcome, recallRating, notes, timeSpentMinutes, completedDate) => {
+        let attemptDate = new Date();
+        if (completedDate) {
+          if (completedDate.includes('T')) {
+            attemptDate = new Date(completedDate);
+          } else {
+            const [y, m, d] = completedDate.split('-').map(Number);
+            attemptDate = new Date(y, m - 1, d, 12, 0, 0);
+          }
+        }
+        const nowIso = attemptDate.toISOString();
         const attemptId = crypto.randomUUID();
         const attemptRecord: AttemptRecord = {
           id: attemptId,
@@ -160,6 +170,7 @@ export const useNeetcodeStore = create<NeetcodeStoreState>()(
 
           // Update outcome flags
           const hasAttempted = true;
+          const isSolved = outcome === 'solved_independently' || outcome === 'solved_with_hints';
           const hasSolvedIndependently =
             existing.hasSolvedIndependently || outcome === 'solved_independently';
           const hasSolvedWithHints =
@@ -176,7 +187,8 @@ export const useNeetcodeStore = create<NeetcodeStoreState>()(
             lastRecallRating = recallRating;
             nextReviewDate = calculateNextReviewDate(
               recallRating,
-              state.spacedRepetitionConfig
+              state.spacedRepetitionConfig,
+              attemptDate
             );
             needsReview = recallRating < 3;
           } else if (outcome === 'attempted' || outcome === 'solution_viewed') {
@@ -192,6 +204,9 @@ export const useNeetcodeStore = create<NeetcodeStoreState>()(
             needsReview,
             lastRecallRating,
             nextReviewDate,
+            completedDate: isSolved
+              ? (completedDate ? nowIso : (existing.completedDate || nowIso))
+              : existing.completedDate,
             firstAttemptDate: existing.firstAttemptDate || nowIso,
             lastAttemptDate: nowIso,
             attempts: [...(existing.attempts || []), attemptRecord],
@@ -302,6 +317,10 @@ export const useNeetcodeStore = create<NeetcodeStoreState>()(
               updates.understandsPattern !== undefined
                 ? updates.understandsPattern
                 : existing.understandsPattern,
+            completedDate:
+              updates.completedDate !== undefined
+                ? (updates.completedDate ? (updates.completedDate.includes('T') ? updates.completedDate : `${updates.completedDate}T12:00:00.000Z`) : undefined)
+                : existing.completedDate,
           };
 
           return {

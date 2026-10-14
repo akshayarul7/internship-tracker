@@ -17,13 +17,14 @@ const state0 = useNeetcodeStore.getState();
 assert(Object.keys(state0.progress).length === 0, 'Clean store has empty progress');
 assert(state0.currentPosition === 1, 'Current position starts at 1');
 
-// 1. Record Attempt: Solved with Hints (should NOT inflate independent solves)
+// 1. Record Attempt: Solved with Hints (should NOT inflate independent solves) with custom completedDate
 useNeetcodeStore.getState().recordAttempt(
   'contains-duplicate',
   'solved_with_hints',
   3,
   'Used hash set approach',
-  15
+  15,
+  '2026-10-05'
 );
 
 const state1 = useNeetcodeStore.getState();
@@ -32,7 +33,9 @@ assert(p1 !== undefined, 'Progress recorded for contains-duplicate');
 assert(p1.hasAttempted === true, 'hasAttempted is true');
 assert(p1.hasSolvedWithHints === true, 'hasSolvedWithHints is true');
 assert(p1.hasSolvedIndependently === false, 'hasSolvedIndependently is false (not inflated)');
+assert(p1.completedDate !== undefined && p1.completedDate.startsWith('2026-10-05'), 'Completed date is saved accurately');
 assert(p1.attempts.length === 1, '1 attempt in history');
+assert(p1.attempts[0].timestamp.startsWith('2026-10-05'), 'Attempt history recorded custom completion date');
 assert(p1.attempts[0].outcome === 'solved_with_hints', 'Attempt outcome recorded');
 assert(p1.lastRecallRating === 3, 'Recall rating is 3');
 assert(p1.nextReviewDate !== undefined, 'Next review date scheduled');

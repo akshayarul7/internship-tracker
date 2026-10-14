@@ -15,6 +15,7 @@ import {
   Edit3,
   Save,
   Brain,
+  Calendar,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -34,6 +35,9 @@ export default function ProblemDetailModal({ problem, onClose, onLogAttempt }: P
   const [timeComplexity, setTimeComplexity] = useState(prog?.timeComplexity || '');
   const [spaceComplexity, setSpaceComplexity] = useState(prog?.spaceComplexity || '');
   const [understandsPattern, setUnderstandsPattern] = useState(prog?.understandsPattern || false);
+  const [completedDate, setCompletedDate] = useState(() =>
+    prog?.completedDate ? prog.completedDate.split('T')[0] : ''
+  );
 
   const handleSaveNotes = () => {
     store.updateProblemNotes(problem.id, {
@@ -42,6 +46,7 @@ export default function ProblemDetailModal({ problem, onClose, onLogAttempt }: P
       timeComplexity,
       spaceComplexity,
       understandsPattern,
+      completedDate: completedDate || undefined,
     });
     setEditing(false);
   };
@@ -140,16 +145,24 @@ export default function ProblemDetailModal({ problem, onClose, onLogAttempt }: P
           )}
 
           {/* Dates */}
-          {prog?.firstAttemptDate && (
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div className="flex items-center gap-2 text-zinc-500">
-                <Clock size={14} />
-                <span>First attempt: {new Date(prog.firstAttemptDate).toLocaleDateString()}</span>
-              </div>
+          {(prog?.firstAttemptDate || prog?.completedDate) && (
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
+              {prog.completedDate && (
+                <div className="flex items-center gap-2 text-green-600 dark:text-green-400 font-medium">
+                  <CheckCircle size={14} />
+                  <span>Completed: {new Date(prog.completedDate).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}</span>
+                </div>
+              )}
+              {prog.firstAttemptDate && (
+                <div className="flex items-center gap-2 text-zinc-500">
+                  <Clock size={14} />
+                  <span>First attempt: {new Date(prog.firstAttemptDate).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}</span>
+                </div>
+              )}
               {prog.lastAttemptDate && (
                 <div className="flex items-center gap-2 text-zinc-500">
                   <Clock size={14} />
-                  <span>Last attempt: {new Date(prog.lastAttemptDate).toLocaleDateString()}</span>
+                  <span>Last attempt: {new Date(prog.lastAttemptDate).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}</span>
                 </div>
               )}
             </div>
@@ -197,6 +210,18 @@ export default function ProblemDetailModal({ problem, onClose, onLogAttempt }: P
                         className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-800 dark:border-zinc-700 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                       />
                     </div>
+                  </div>
+                  <div>
+                    <label className="text-xs font-medium text-zinc-500 block mb-1 flex items-center gap-1">
+                      <Calendar size={12} className="text-zinc-400" />
+                      <span>Date Completed</span>
+                    </label>
+                    <input
+                      type="date"
+                      value={completedDate}
+                      onChange={(e) => setCompletedDate(e.target.value)}
+                      className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-800 dark:border-zinc-700 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                    />
                   </div>
                   <div>
                     <label className="text-xs font-medium text-zinc-500 block mb-1">Personal Notes</label>
