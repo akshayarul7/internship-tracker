@@ -7,6 +7,7 @@ import ApplicationList from '../components/ApplicationList';
 import ApplicationForm from '../components/ApplicationForm';
 import { Plus, Download } from 'lucide-react';
 import { useStore } from '../store/useStore';
+import { getLocalDateString } from '@/lib/utils';
 
 export default function Home() {
   const { applications } = useStore();
@@ -40,7 +41,7 @@ export default function Home() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.setAttribute('download', `internship_applications_${new Date().toISOString().split('T')[0]}.csv`);
+    link.setAttribute('download', `internship_applications_${getLocalDateString()}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { ApplicationStatus, Application } from '../types';
 import { useStore } from '../store/useStore';
 import { X } from 'lucide-react';
+import { getLocalDateString } from '@/lib/utils';
 
 interface ApplicationFormProps {
   onClose: () => void;
@@ -25,7 +26,7 @@ export default function ApplicationForm({ onClose, applicationToEdit }: Applicat
       portalLink: applicationToEdit.portalLink,
       notes: applicationToEdit.notes,
     } : {
-      dateApplied: new Date().toISOString().split('T')[0],
+      dateApplied: getLocalDateString(),
       status: 'Applied',
     }
   });

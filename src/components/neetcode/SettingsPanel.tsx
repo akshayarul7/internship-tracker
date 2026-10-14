@@ -14,6 +14,7 @@ import {
   RotateCcw,
 } from 'lucide-react';
 import type { RecallRating } from '@/types/neetcode';
+import { getLocalDateString } from '@/lib/utils';
 
 export default function SettingsPanel() {
   const store = useNeetcodeStore();
@@ -116,7 +117,7 @@ export default function SettingsPanel() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `neetcode-tracker-backup-${new Date().toISOString().split('T')[0]}.json`;
+    link.download = `neetcode-tracker-backup-${getLocalDateString()}.json`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

@@ -129,6 +129,21 @@ function createDefaultProgress(problemId: string): ProblemProgress {
   };
 }
 
+/**
+ * Parses a YYYY-MM-DD or date string to an ISO string representing local noon,
+ * preventing timezone shift issues.
+ */
+function parseDateStringToIso(dateStr?: string): string | undefined {
+  if (!dateStr) return undefined;
+  if (dateStr.includes('T')) return dateStr;
+  const parts = dateStr.split('-').map(Number);
+  if (parts.length === 3 && !isNaN(parts[0]) && !isNaN(parts[1]) && !isNaN(parts[2])) {
+    return new Date(parts[0], parts[1] - 1, parts[2], 12, 0, 0).toISOString();
+  }
+  const parsed = new Date(dateStr);
+  return isNaN(parsed.getTime()) ? undefined : parsed.toISOString();
+}
+
 const DEFAULT_SPACED_REPETITION_CONFIG: SpacedRepetitionConfig = {
   intervals: {
     4: 30,
@@ -263,12 +278,8 @@ export const useNeetcodeStore = create<NeetcodeStoreState>()(
       recordAttempt: (problemId, outcome, recallRating, notes, timeSpentMinutes, completedDate) => {
         let attemptDate = new Date();
         if (completedDate) {
-          if (completedDate.includes('T')) {
-            attemptDate = new Date(completedDate);
-          } else {
-            const [y, m, d] = completedDate.split('-').map(Number);
-            attemptDate = new Date(y, m - 1, d, 12, 0, 0);
-          }
+          const parsedIso = parseDateStringToIso(completedDate);
+          if (parsedIso) attemptDate = new Date(parsedIso);
         }
         const nowIso = attemptDate.toISOString();
         const attemptId = crypto.randomUUID();
@@ -436,7 +447,7 @@ export const useNeetcodeStore = create<NeetcodeStoreState>()(
                 : existing.understandsPattern,
             completedDate:
               updates.completedDate !== undefined
-                ? (updates.completedDate ? (updates.completedDate.includes('T') ? updates.completedDate : `${updates.completedDate}T12:00:00.000Z`) : undefined)
+                ? parseDateStringToIso(updates.completedDate)
                 : existing.completedDate,
           };
 
@@ -659,9 +670,8 @@ export const useNeetcodeStore = create<NeetcodeStoreState>()(
             if (att.id !== attemptId) return att;
             let timestamp = att.timestamp;
             if (updates.timestamp) {
-              timestamp = updates.timestamp.includes('T')
-                ? updates.timestamp
-                : `${updates.timestamp}T12:00:00.000Z`;
+              const parsedIso = parseDateStringToIso(updates.timestamp);
+              if (parsedIso) timestamp = parsedIso;
             }
             return {
               ...att,
@@ -725,10 +735,7 @@ export const useNeetcodeStore = create<NeetcodeStoreState>()(
         set((state) => {
           const existing =
             state.progress[problemId] ?? createDefaultProgress(problemId);
-          let formattedDate: string | undefined = undefined;
-          if (date) {
-            formattedDate = date.includes('T') ? date : `${date}T12:00:00.000Z`;
-          }
+          const formattedDate = parseDateStringToIso(date);
           return {
             progress: {
               ...state.progress,

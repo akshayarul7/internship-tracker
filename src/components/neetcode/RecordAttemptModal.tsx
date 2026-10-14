@@ -5,7 +5,7 @@ import { useNeetcodeStore } from '@/store/useNeetcodeStore';
 import type { AttemptOutcome, RecallRating, NeetcodeProblem } from '@/types/neetcode';
 import { getRecallDescription, getIntervalDescription } from '@/lib/neetcode/scheduling';
 import { X, ExternalLink, CheckCircle, HelpCircle, AlertCircle, Eye, Calendar, Clock } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn, getLocalDateString } from '@/lib/utils';
 
 interface RecordAttemptModalProps {
   problem: NeetcodeProblem;
@@ -33,7 +33,7 @@ export default function RecordAttemptModal({ problem, onClose, sessionMode, onRe
 
   const [outcome, setOutcome] = useState<AttemptOutcome | null>(null);
   const [recallRating, setRecallRating] = useState<RecallRating | null>(null);
-  const [completedDate, setCompletedDate] = useState(() => new Date().toISOString().split('T')[0]);
+  const [completedDate, setCompletedDate] = useState(() => getLocalDateString());
   const [notes, setNotes] = useState('');
   const [timeSpent, setTimeSpent] = useState('');
 

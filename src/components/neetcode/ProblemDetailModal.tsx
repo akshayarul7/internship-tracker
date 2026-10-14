@@ -20,7 +20,7 @@ import {
   Trash2,
   Check,
 } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn, getLocalDateString } from '@/lib/utils';
 
 interface ProblemDetailModalProps {
   problem: NeetcodeProblem;
@@ -46,13 +46,13 @@ export default function ProblemDetailModal({ problem, onClose, onLogAttempt }: P
   const [spaceComplexity, setSpaceComplexity] = useState(prog?.spaceComplexity || '');
   const [understandsPattern, setUnderstandsPattern] = useState(prog?.understandsPattern || false);
   const [completedDate, setCompletedDate] = useState(() =>
-    prog?.completedDate ? prog.completedDate.split('T')[0] : ''
+    prog?.completedDate ? getLocalDateString(prog.completedDate) : ''
   );
 
   // Direct completed date editing
   const [isEditingCompletedDate, setIsEditingCompletedDate] = useState(false);
   const [directCompletedDate, setDirectCompletedDate] = useState(
-    prog?.completedDate ? prog.completedDate.split('T')[0] : ''
+    prog?.completedDate ? getLocalDateString(prog.completedDate) : ''
   );
 
   // Attempt editing state
@@ -85,7 +85,7 @@ export default function ProblemDetailModal({ problem, onClose, onLogAttempt }: P
     setEditingAttemptId(att.id);
     setEditOutcome(att.outcome);
     setEditRecall(att.recallRating);
-    setEditTimestamp(att.timestamp ? att.timestamp.split('T')[0] : new Date().toISOString().split('T')[0]);
+    setEditTimestamp(att.timestamp ? getLocalDateString(att.timestamp) : getLocalDateString());
     setEditTimeSpent(att.timeSpentMinutes !== undefined ? String(att.timeSpentMinutes) : '');
     setEditNotes(att.notes || '');
   };
@@ -244,7 +244,7 @@ export default function ProblemDetailModal({ problem, onClose, onLogAttempt }: P
                       type="button"
                       onClick={() => {
                         setIsEditingCompletedDate(false);
-                        setDirectCompletedDate(prog?.completedDate ? prog.completedDate.split('T')[0] : '');
+                        setDirectCompletedDate(prog?.completedDate ? getLocalDateString(prog.completedDate) : '');
                       }}
                       className="p-1 text-zinc-400 hover:text-zinc-600 rounded"
                       title="Cancel"
@@ -275,8 +275,8 @@ export default function ProblemDetailModal({ problem, onClose, onLogAttempt }: P
                       onClick={() => {
                         setDirectCompletedDate(
                           prog?.completedDate
-                            ? prog.completedDate.split('T')[0]
-                            : new Date().toISOString().split('T')[0]
+                            ? getLocalDateString(prog.completedDate)
+                            : getLocalDateString()
                         );
                         setIsEditingCompletedDate(true);
                       }}
