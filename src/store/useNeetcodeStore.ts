@@ -108,6 +108,9 @@ export interface NeetcodeStoreActions {
 
   // Reset all progress (careful!)
   resetAllProgress: () => void;
+
+  // Sync with SQLite database
+  syncFromDatabase: () => Promise<void>;
 }
 
 export interface NeetcodeStoreState extends NeetcodeState, NeetcodeStoreActions {}
@@ -770,9 +773,91 @@ export const useNeetcodeStore = create<NeetcodeStoreState>()(
           reactivationDismissedAt: undefined,
         });
       },
+
+      syncFromDatabase: async () => {
+        if (typeof window === 'undefined') return;
+        try {
+          isHydratingFromDb = true;
+          const res = await fetch('/api/neetcode');
+          if (!res.ok) throw new Error('API error');
+          const data = await res.json();
+          if (data.configured === false) return;
+          const serverState: NeetcodeState | null = data.state;
+          const localProgress = get().progress;
+          const hasLocalData = Object.keys(localProgress || {}).length > 0;
+
+          if (serverState && Object.keys(serverState.progress || {}).length > 0) {
+            set({
+              progress: serverState.progress || {},
+              currentPosition: serverState.currentPosition ?? 1,
+              activeSession: serverState.activeSession ?? null,
+              sessionHistory: serverState.sessionHistory ?? [],
+              lastActivityDate: serverState.lastActivityDate,
+              lastReactivationDate: serverState.lastReactivationDate,
+              reactivationDismissedAt: serverState.reactivationDismissedAt,
+              spacedRepetitionConfig: serverState.spacedRepetitionConfig ?? get().spacedRepetitionConfig,
+              dailyPracticeConfig: serverState.dailyPracticeConfig ?? get().dailyPracticeConfig,
+              reactivationConfig: serverState.reactivationConfig ?? get().reactivationConfig,
+            });
+          } else if (hasLocalData) {
+            // Local storage has data, SQLite is empty -> push to SQLite!
+            const current = get();
+            await fetch('/api/neetcode', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                progress: current.progress,
+                currentPosition: current.currentPosition,
+                activeSession: current.activeSession,
+                sessionHistory: current.sessionHistory,
+                lastActivityDate: current.lastActivityDate,
+                lastReactivationDate: current.lastReactivationDate,
+                reactivationDismissedAt: current.reactivationDismissedAt,
+                spacedRepetitionConfig: current.spacedRepetitionConfig,
+                dailyPracticeConfig: current.dailyPracticeConfig,
+                reactivationConfig: current.reactivationConfig,
+              }),
+            });
+          }
+        } catch (err) {
+          console.error('Error syncing NeetCode state with SQLite:', err);
+        } finally {
+          setTimeout(() => {
+            isHydratingFromDb = false;
+          }, 500);
+        }
+      },
     }),
     {
       name: 'neetcode-tracker-storage',
     }
   )
 );
+
+let isHydratingFromDb = false;
+let neetcodeSaveTimeout: ReturnType<typeof setTimeout> | null = null;
+
+if (typeof window !== 'undefined') {
+  useNeetcodeStore.subscribe((state) => {
+    if (isHydratingFromDb) return;
+    if (neetcodeSaveTimeout) clearTimeout(neetcodeSaveTimeout);
+    neetcodeSaveTimeout = setTimeout(() => {
+      fetch('/api/neetcode', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          progress: state.progress,
+          currentPosition: state.currentPosition,
+          activeSession: state.activeSession,
+          sessionHistory: state.sessionHistory,
+          lastActivityDate: state.lastActivityDate,
+          lastReactivationDate: state.lastReactivationDate,
+          reactivationDismissedAt: state.reactivationDismissedAt,
+          spacedRepetitionConfig: state.spacedRepetitionConfig,
+          dailyPracticeConfig: state.dailyPracticeConfig,
+          reactivationConfig: state.reactivationConfig,
+        }),
+      }).catch((err) => console.error('Failed to auto-save NeetCode to SQLite:', err));
+    }, 500);
+  });
+}
