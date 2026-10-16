@@ -1,9 +1,12 @@
 import { NextResponse } from 'next/server';
-import { supabase, isSupabaseConfigured } from '@/lib/supabase';
+import { getSupabase } from '@/lib/supabase';
 import type { Application } from '@/types';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
-  if (!isSupabaseConfigured || !supabase) {
+  const supabase = getSupabase();
+  if (!supabase) {
     return NextResponse.json({ configured: false, applications: [] });
   }
 
@@ -29,7 +32,8 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  if (!isSupabaseConfigured || !supabase) {
+  const supabase = getSupabase();
+  if (!supabase) {
     return NextResponse.json({ configured: false });
   }
 
@@ -69,7 +73,8 @@ export async function POST(request: Request) {
 }
 
 export async function DELETE(request: Request) {
-  if (!isSupabaseConfigured || !supabase) {
+  const supabase = getSupabase();
+  if (!supabase) {
     return NextResponse.json({ configured: false });
   }
 
@@ -97,7 +102,8 @@ export async function DELETE(request: Request) {
 }
 
 export async function PUT(request: Request) {
-  if (!isSupabaseConfigured || !supabase) {
+  const supabase = getSupabase();
+  if (!supabase) {
     return NextResponse.json({ configured: false });
   }
 
