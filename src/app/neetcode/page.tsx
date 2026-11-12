@@ -55,13 +55,6 @@ export default function NeetcodePage() {
 
   const showReactivation = needsReactivation && !reactivationDismissed;
 
-  // Auto-switch to practice tab if there's an active session
-  useEffect(() => {
-    if (activeSession && activeTab !== 'practice') {
-      setActiveTab('practice');
-    }
-  }, [activeSession, activeTab]);
-
   if (!isMounted) return null;
 
   // Show reactivation flow if needed
@@ -94,12 +87,13 @@ export default function NeetcodePage() {
         <div className="flex flex-wrap gap-1 bg-white dark:bg-zinc-900 p-1 rounded-xl border dark:border-zinc-800 shadow-sm">
           {tabs.map((tab) => {
             const Icon = tab.icon;
+            const hasActiveSession = tab.id === 'practice' && Boolean(activeSession);
             return (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={cn(
-                  'flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors',
+                  'flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors relative',
                   activeTab === tab.id
                     ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
                     : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50 dark:text-zinc-400 dark:hover:text-zinc-200 dark:hover:bg-zinc-800'
@@ -107,6 +101,12 @@ export default function NeetcodePage() {
               >
                 <Icon size={16} />
                 <span className="hidden sm:inline">{tab.label}</span>
+                {hasActiveSession && (
+                  <span
+                    className="w-2 h-2 rounded-full bg-blue-500 animate-pulse ml-0.5"
+                    title="Active practice session in progress"
+                  />
+                )}
               </button>
             );
           })}
@@ -120,7 +120,9 @@ export default function NeetcodePage() {
           />
         )}
         {activeTab === 'roadmap' && <ProblemRoadmap />}
-        {activeTab === 'practice' && <PracticeSessionView />}
+        {activeTab === 'practice' && (
+          <PracticeSessionView onNavigate={(tab) => setActiveTab(tab)} />
+        )}
         {activeTab === 'insights' && <LearningInsights />}
         {activeTab === 'settings' && <SettingsPanel />}
       </div>

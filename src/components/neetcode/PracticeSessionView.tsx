@@ -7,7 +7,6 @@ import { generateDailySession, getDueProblems } from '@/lib/neetcode/scheduling'
 import RecordAttemptModal from './RecordAttemptModal';
 import type { NeetcodeProblem, SessionProblem } from '@/types/neetcode';
 import {
-  Play,
   Pause,
   CheckCircle,
   Circle,
@@ -21,7 +20,11 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-export default function PracticeSessionView() {
+interface PracticeSessionViewProps {
+  onNavigate?: (tab: 'dashboard' | 'roadmap' | 'practice' | 'insights' | 'settings') => void;
+}
+
+export default function PracticeSessionView({ onNavigate }: PracticeSessionViewProps = {}) {
   const store = useNeetcodeStore();
   const { activeSession, progress, dailyPracticeConfig, currentPosition } = store;
 
@@ -65,12 +68,14 @@ export default function PracticeSessionView() {
   const handleEndSession = useCallback(() => {
     if (activeSession && window.confirm('End this session? Your recorded attempts are already saved.')) {
       store.endSession();
+      onNavigate?.('dashboard');
     }
-  }, [activeSession, store]);
+  }, [activeSession, store, onNavigate]);
 
   const handlePauseSession = useCallback(() => {
     store.pauseSession();
-  }, [store]);
+    onNavigate?.('dashboard');
+  }, [store, onNavigate]);
 
   const currentProblem = useMemo(() => {
     if (!activeSession) return null;
@@ -174,9 +179,19 @@ export default function PracticeSessionView() {
             </div>
           </div>
           <div className="flex items-center gap-2">
+            {onNavigate && (
+              <button
+                onClick={() => onNavigate('dashboard')}
+                className="hidden sm:inline-flex items-center gap-1 px-3 py-1.5 text-sm text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors"
+                title="View dashboard without losing session progress"
+              >
+                Dashboard
+              </button>
+            )}
             <button
               onClick={handlePauseSession}
               className="flex items-center gap-1 px-3 py-1.5 text-sm border rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-800 dark:border-zinc-700 transition-colors"
+              title="Pause session and return to dashboard"
             >
               <Pause size={14} />
               Pause
@@ -184,6 +199,7 @@ export default function PracticeSessionView() {
             <button
               onClick={handleEndSession}
               className="flex items-center gap-1 px-3 py-1.5 text-sm border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+              title="End session"
             >
               <X size={14} />
               End
@@ -301,7 +317,10 @@ export default function PracticeSessionView() {
                 Great work! You completed {sessionStats?.completed} out of {sessionStats?.total} problems.
               </p>
               <button
-                onClick={() => store.endSession()}
+                onClick={() => {
+                  store.endSession();
+                  onNavigate?.('dashboard');
+                }}
                 className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
               >
                 Finish Session

@@ -64,6 +64,9 @@ export interface NeetcodeStoreActions {
   // End the current session
   endSession: () => void;
 
+  // Cancel the current session without saving to history
+  cancelSession: () => void;
+
   // Pause session (just records progress, session stays active)
   pauseSession: () => void;
 
@@ -585,13 +588,21 @@ export const useNeetcodeStore = create<NeetcodeStoreState>()(
           };
 
           const isReactivation = activeSession.type === 'reactivation';
+          const hasActivity = attemptedProblems.length > 0 || completedProblems.length > 0;
 
           return {
             activeSession: null,
-            sessionHistory: [...state.sessionHistory, historyEntry],
+            sessionHistory: hasActivity ? [...state.sessionHistory, historyEntry] : state.sessionHistory,
             lastReactivationDate: isReactivation ? nowIso : state.lastReactivationDate,
             lastActivityDate: nowIso,
           };
+        });
+      },
+
+      cancelSession: () => {
+        set({
+          activeSession: null,
+          lastActivityDate: new Date().toISOString(),
         });
       },
 
