@@ -175,7 +175,7 @@ console.log('\n--- Testing Daily Practice Session Allocation ---');
 const dailyConfig: DailyPracticeConfig = {
   reviewPercentage: 20,
   newPercentage: 80,
-  maxProblemsPerSession: 5,
+  maxProblemsPerSession: 3,
   maxOverduePerSession: 3,
 };
 

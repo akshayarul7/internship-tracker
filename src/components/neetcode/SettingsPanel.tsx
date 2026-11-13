@@ -90,7 +90,7 @@ export default function SettingsPanel() {
       updateDailyPracticeConfig({
         reviewPercentage: 20,
         newPercentage: 80,
-        maxProblemsPerSession: 5,
+        maxProblemsPerSession: 3,
         maxOverduePerSession: 3,
       });
       updateReactivationConfig({
@@ -292,10 +292,10 @@ export default function SettingsPanel() {
                 min="1"
                 max="20"
                 value={dailyPracticeConfig.maxProblemsPerSession}
-                onChange={(e) => handleMaxProblemsChange(parseInt(e.target.value) || 5)}
+                onChange={(e) => handleMaxProblemsChange(parseInt(e.target.value) || 3)}
                 className="w-full px-3 py-2 border rounded-lg dark:bg-zinc-800 dark:border-zinc-700 text-sm"
               />
-              <p className="text-xs text-zinc-400 mt-1">Default: 5 problems per daily practice</p>
+              <p className="text-xs text-zinc-400 mt-1">Default: 3 problems per daily practice</p>
             </div>
 
             <div>

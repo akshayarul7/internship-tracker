@@ -162,7 +162,7 @@ const DEFAULT_SPACED_REPETITION_CONFIG: SpacedRepetitionConfig = {
 const DEFAULT_DAILY_PRACTICE_CONFIG: DailyPracticeConfig = {
   reviewPercentage: 20,
   newPercentage: 80,
-  maxProblemsPerSession: 5,
+  maxProblemsPerSession: 3,
   maxOverduePerSession: 3,
 };
 
@@ -807,7 +807,15 @@ export const useNeetcodeStore = create<NeetcodeStoreState>()(
               lastReactivationDate: serverState.lastReactivationDate,
               reactivationDismissedAt: serverState.reactivationDismissedAt,
               spacedRepetitionConfig: serverState.spacedRepetitionConfig ?? get().spacedRepetitionConfig,
-              dailyPracticeConfig: serverState.dailyPracticeConfig ?? get().dailyPracticeConfig,
+              dailyPracticeConfig: serverState.dailyPracticeConfig
+                ? {
+                    ...serverState.dailyPracticeConfig,
+                    maxProblemsPerSession:
+                      serverState.dailyPracticeConfig.maxProblemsPerSession === 5
+                        ? 3
+                        : serverState.dailyPracticeConfig.maxProblemsPerSession,
+                  }
+                : get().dailyPracticeConfig,
               reactivationConfig: serverState.reactivationConfig ?? get().reactivationConfig,
             });
           } else if (hasLocalData) {
@@ -841,6 +849,19 @@ export const useNeetcodeStore = create<NeetcodeStoreState>()(
     }),
     {
       name: 'neetcode-tracker-storage',
+      version: 2,
+      migrate: (persistedState: unknown) => {
+        const state = persistedState as Partial<NeetcodeStoreState> | undefined;
+        if (state?.dailyPracticeConfig && state.dailyPracticeConfig.maxProblemsPerSession === 5) {
+          state.dailyPracticeConfig.maxProblemsPerSession = 3;
+        }
+        return state as NeetcodeStoreState;
+      },
+      onRehydrateStorage: () => (state) => {
+        if (state && state.dailyPracticeConfig?.maxProblemsPerSession === 5) {
+          state.updateDailyPracticeConfig({ maxProblemsPerSession: 3 });
+        }
+      },
     }
   )
 );

@@ -439,7 +439,7 @@ export function generateDailySession(
   currentDate?: Date
 ): SessionProblem[] {
   const today = currentDate ? new Date(currentDate) : new Date();
-  const maxTotal = config.maxProblemsPerSession > 0 ? config.maxProblemsPerSession : 5;
+  const maxTotal = config.maxProblemsPerSession > 0 ? config.maxProblemsPerSession : 3;
   const maxOverdue =
     config.maxOverduePerSession !== undefined ? config.maxOverduePerSession : 3;
 

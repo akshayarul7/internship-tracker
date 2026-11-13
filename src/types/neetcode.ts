@@ -201,7 +201,7 @@ export interface DailyPracticeConfig {
   reviewPercentage: number;
   /** Target percentage of new problems (0-100, default 80) */
   newPercentage: number;
-  /** Maximum problems recommended per practice session (default 5) */
+  /** Maximum problems recommended per practice session (default 3) */
   maxProblemsPerSession: number;
   /** Maximum overdue review problems to present in a single session (default 3) */
   maxOverduePerSession: number;
