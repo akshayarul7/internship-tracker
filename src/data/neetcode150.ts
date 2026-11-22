@@ -242,22 +242,13 @@ export const NEETCODE_PROBLEMS: NeetcodeProblem[] = [
     order: 23,
   },
   {
-    id: "generate-parentheses",
-    name: "Generate Parentheses",
-    title: "Generate Parentheses",
-    category: "Stack",
-    difficulty: "Medium",
-    leetcodeUrl: "https://leetcode.com/problems/generate-parentheses/",
-    order: 24,
-  },
-  {
     id: "daily-temperatures",
     name: "Daily Temperatures",
     title: "Daily Temperatures",
     category: "Stack",
     difficulty: "Medium",
     leetcodeUrl: "https://leetcode.com/problems/daily-temperatures/",
-    order: 25,
+    order: 24,
   },
   {
     id: "car-fleet",
@@ -266,7 +257,7 @@ export const NEETCODE_PROBLEMS: NeetcodeProblem[] = [
     category: "Stack",
     difficulty: "Medium",
     leetcodeUrl: "https://leetcode.com/problems/car-fleet/",
-    order: 26,
+    order: 25,
   },
   {
     id: "largest-rectangle-in-histogram",
@@ -275,7 +266,7 @@ export const NEETCODE_PROBLEMS: NeetcodeProblem[] = [
     category: "Stack",
     difficulty: "Hard",
     leetcodeUrl: "https://leetcode.com/problems/largest-rectangle-in-histogram/",
-    order: 27,
+    order: 26,
   },
   {
     id: "binary-search",
@@ -284,7 +275,7 @@ export const NEETCODE_PROBLEMS: NeetcodeProblem[] = [
     category: "Binary Search",
     difficulty: "Easy",
     leetcodeUrl: "https://leetcode.com/problems/binary-search/",
-    order: 28,
+    order: 27,
   },
   {
     id: "search-a-2d-matrix",
@@ -293,7 +284,7 @@ export const NEETCODE_PROBLEMS: NeetcodeProblem[] = [
     category: "Binary Search",
     difficulty: "Medium",
     leetcodeUrl: "https://leetcode.com/problems/search-a-2d-matrix/",
-    order: 29,
+    order: 28,
   },
   {
     id: "koko-eating-bananas",
@@ -302,7 +293,7 @@ export const NEETCODE_PROBLEMS: NeetcodeProblem[] = [
     category: "Binary Search",
     difficulty: "Medium",
     leetcodeUrl: "https://leetcode.com/problems/koko-eating-bananas/",
-    order: 30,
+    order: 29,
   },
   {
     id: "find-minimum-in-rotated-sorted-array",
@@ -311,7 +302,7 @@ export const NEETCODE_PROBLEMS: NeetcodeProblem[] = [
     category: "Binary Search",
     difficulty: "Medium",
     leetcodeUrl: "https://leetcode.com/problems/find-minimum-in-rotated-sorted-array/",
-    order: 31,
+    order: 30,
   },
   {
     id: "search-in-rotated-sorted-array",
@@ -320,7 +311,7 @@ export const NEETCODE_PROBLEMS: NeetcodeProblem[] = [
     category: "Binary Search",
     difficulty: "Medium",
     leetcodeUrl: "https://leetcode.com/problems/search-in-rotated-sorted-array/",
-    order: 32,
+    order: 31,
   },
   {
     id: "time-based-key-value-store",
@@ -329,7 +320,7 @@ export const NEETCODE_PROBLEMS: NeetcodeProblem[] = [
     category: "Binary Search",
     difficulty: "Medium",
     leetcodeUrl: "https://leetcode.com/problems/time-based-key-value-store/",
-    order: 33,
+    order: 32,
   },
   {
     id: "median-of-two-sorted-arrays",
@@ -338,7 +329,7 @@ export const NEETCODE_PROBLEMS: NeetcodeProblem[] = [
     category: "Binary Search",
     difficulty: "Hard",
     leetcodeUrl: "https://leetcode.com/problems/median-of-two-sorted-arrays/",
-    order: 34,
+    order: 33,
   },
   {
     id: "reverse-linked-list",
@@ -347,7 +338,7 @@ export const NEETCODE_PROBLEMS: NeetcodeProblem[] = [
     category: "Linked List",
     difficulty: "Easy",
     leetcodeUrl: "https://leetcode.com/problems/reverse-linked-list/",
-    order: 35,
+    order: 34,
   },
   {
     id: "merge-two-sorted-lists",
@@ -356,7 +347,7 @@ export const NEETCODE_PROBLEMS: NeetcodeProblem[] = [
     category: "Linked List",
     difficulty: "Easy",
     leetcodeUrl: "https://leetcode.com/problems/merge-two-sorted-lists/",
-    order: 36,
+    order: 35,
   },
   {
     id: "reorder-list",
@@ -365,7 +356,7 @@ export const NEETCODE_PROBLEMS: NeetcodeProblem[] = [
     category: "Linked List",
     difficulty: "Medium",
     leetcodeUrl: "https://leetcode.com/problems/reorder-list/",
-    order: 37,
+    order: 36,
   },
   {
     id: "remove-nth-node-from-end-of-list",
@@ -374,7 +365,7 @@ export const NEETCODE_PROBLEMS: NeetcodeProblem[] = [
     category: "Linked List",
     difficulty: "Medium",
     leetcodeUrl: "https://leetcode.com/problems/remove-nth-node-from-end-of-list/",
-    order: 38,
+    order: 37,
   },
   {
     id: "copy-list-with-random-pointer",
@@ -383,7 +374,7 @@ export const NEETCODE_PROBLEMS: NeetcodeProblem[] = [
     category: "Linked List",
     difficulty: "Medium",
     leetcodeUrl: "https://leetcode.com/problems/copy-list-with-random-pointer/",
-    order: 39,
+    order: 38,
   },
   {
     id: "add-two-numbers",
@@ -392,7 +383,7 @@ export const NEETCODE_PROBLEMS: NeetcodeProblem[] = [
     category: "Linked List",
     difficulty: "Medium",
     leetcodeUrl: "https://leetcode.com/problems/add-two-numbers/",
-    order: 40,
+    order: 39,
   },
   {
     id: "linked-list-cycle",
@@ -401,7 +392,7 @@ export const NEETCODE_PROBLEMS: NeetcodeProblem[] = [
     category: "Linked List",
     difficulty: "Easy",
     leetcodeUrl: "https://leetcode.com/problems/linked-list-cycle/",
-    order: 41,
+    order: 40,
   },
   {
     id: "find-the-duplicate-number",
@@ -410,7 +401,7 @@ export const NEETCODE_PROBLEMS: NeetcodeProblem[] = [
     category: "Linked List",
     difficulty: "Medium",
     leetcodeUrl: "https://leetcode.com/problems/find-the-duplicate-number/",
-    order: 42,
+    order: 41,
   },
   {
     id: "lru-cache",
@@ -419,7 +410,7 @@ export const NEETCODE_PROBLEMS: NeetcodeProblem[] = [
     category: "Linked List",
     difficulty: "Medium",
     leetcodeUrl: "https://leetcode.com/problems/lru-cache/",
-    order: 43,
+    order: 42,
   },
   {
     id: "merge-k-sorted-lists",
@@ -428,7 +419,7 @@ export const NEETCODE_PROBLEMS: NeetcodeProblem[] = [
     category: "Linked List",
     difficulty: "Hard",
     leetcodeUrl: "https://leetcode.com/problems/merge-k-sorted-lists/",
-    order: 44,
+    order: 43,
   },
   {
     id: "reverse-nodes-in-k-group",
@@ -437,7 +428,7 @@ export const NEETCODE_PROBLEMS: NeetcodeProblem[] = [
     category: "Linked List",
     difficulty: "Hard",
     leetcodeUrl: "https://leetcode.com/problems/reverse-nodes-in-k-group/",
-    order: 45,
+    order: 44,
   },
   {
     id: "invert-binary-tree",
@@ -446,7 +437,7 @@ export const NEETCODE_PROBLEMS: NeetcodeProblem[] = [
     category: "Trees",
     difficulty: "Easy",
     leetcodeUrl: "https://leetcode.com/problems/invert-binary-tree/",
-    order: 46,
+    order: 45,
   },
   {
     id: "maximum-depth-of-binary-tree",
@@ -455,7 +446,7 @@ export const NEETCODE_PROBLEMS: NeetcodeProblem[] = [
     category: "Trees",
     difficulty: "Easy",
     leetcodeUrl: "https://leetcode.com/problems/maximum-depth-of-binary-tree/",
-    order: 47,
+    order: 46,
   },
   {
     id: "diameter-of-binary-tree",
@@ -464,7 +455,7 @@ export const NEETCODE_PROBLEMS: NeetcodeProblem[] = [
     category: "Trees",
     difficulty: "Easy",
     leetcodeUrl: "https://leetcode.com/problems/diameter-of-binary-tree/",
-    order: 48,
+    order: 47,
   },
   {
     id: "balanced-binary-tree",
@@ -473,7 +464,7 @@ export const NEETCODE_PROBLEMS: NeetcodeProblem[] = [
     category: "Trees",
     difficulty: "Easy",
     leetcodeUrl: "https://leetcode.com/problems/balanced-binary-tree/",
-    order: 49,
+    order: 48,
   },
   {
     id: "same-tree",
@@ -482,7 +473,7 @@ export const NEETCODE_PROBLEMS: NeetcodeProblem[] = [
     category: "Trees",
     difficulty: "Easy",
     leetcodeUrl: "https://leetcode.com/problems/same-tree/",
-    order: 50,
+    order: 49,
   },
   {
     id: "subtree-of-another-tree",
@@ -491,7 +482,7 @@ export const NEETCODE_PROBLEMS: NeetcodeProblem[] = [
     category: "Trees",
     difficulty: "Easy",
     leetcodeUrl: "https://leetcode.com/problems/subtree-of-another-tree/",
-    order: 51,
+    order: 50,
   },
   {
     id: "lowest-common-ancestor-of-a-binary-search-tree",
@@ -500,7 +491,7 @@ export const NEETCODE_PROBLEMS: NeetcodeProblem[] = [
     category: "Trees",
     difficulty: "Medium",
     leetcodeUrl: "https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-search-tree/",
-    order: 52,
+    order: 51,
   },
   {
     id: "binary-tree-level-order-traversal",
@@ -509,7 +500,7 @@ export const NEETCODE_PROBLEMS: NeetcodeProblem[] = [
     category: "Trees",
     difficulty: "Medium",
     leetcodeUrl: "https://leetcode.com/problems/binary-tree-level-order-traversal/",
-    order: 53,
+    order: 52,
   },
   {
     id: "binary-tree-right-side-view",
@@ -518,7 +509,7 @@ export const NEETCODE_PROBLEMS: NeetcodeProblem[] = [
     category: "Trees",
     difficulty: "Medium",
     leetcodeUrl: "https://leetcode.com/problems/binary-tree-right-side-view/",
-    order: 54,
+    order: 53,
   },
   {
     id: "count-good-nodes-in-binary-tree",
@@ -527,7 +518,7 @@ export const NEETCODE_PROBLEMS: NeetcodeProblem[] = [
     category: "Trees",
     difficulty: "Medium",
     leetcodeUrl: "https://leetcode.com/problems/count-good-nodes-in-binary-tree/",
-    order: 55,
+    order: 54,
   },
   {
     id: "validate-binary-search-tree",
@@ -536,7 +527,7 @@ export const NEETCODE_PROBLEMS: NeetcodeProblem[] = [
     category: "Trees",
     difficulty: "Medium",
     leetcodeUrl: "https://leetcode.com/problems/validate-binary-search-tree/",
-    order: 56,
+    order: 55,
   },
   {
     id: "kth-smallest-element-in-a-bst",
@@ -545,7 +536,7 @@ export const NEETCODE_PROBLEMS: NeetcodeProblem[] = [
     category: "Trees",
     difficulty: "Medium",
     leetcodeUrl: "https://leetcode.com/problems/kth-smallest-element-in-a-bst/",
-    order: 57,
+    order: 56,
   },
   {
     id: "construct-binary-tree-from-preorder-and-inorder-traversal",
@@ -554,7 +545,7 @@ export const NEETCODE_PROBLEMS: NeetcodeProblem[] = [
     category: "Trees",
     difficulty: "Medium",
     leetcodeUrl: "https://leetcode.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal/",
-    order: 58,
+    order: 57,
   },
   {
     id: "binary-tree-maximum-path-sum",
@@ -563,7 +554,7 @@ export const NEETCODE_PROBLEMS: NeetcodeProblem[] = [
     category: "Trees",
     difficulty: "Hard",
     leetcodeUrl: "https://leetcode.com/problems/binary-tree-maximum-path-sum/",
-    order: 59,
+    order: 58,
   },
   {
     id: "serialize-and-deserialize-binary-tree",
@@ -572,7 +563,7 @@ export const NEETCODE_PROBLEMS: NeetcodeProblem[] = [
     category: "Trees",
     difficulty: "Hard",
     leetcodeUrl: "https://leetcode.com/problems/serialize-and-deserialize-binary-tree/",
-    order: 60,
+    order: 59,
   },
   {
     id: "implement-trie-prefix-tree",
@@ -581,7 +572,7 @@ export const NEETCODE_PROBLEMS: NeetcodeProblem[] = [
     category: "Tries",
     difficulty: "Medium",
     leetcodeUrl: "https://leetcode.com/problems/implement-trie-prefix-tree/",
-    order: 61,
+    order: 60,
   },
   {
     id: "design-add-and-search-words-data-structure",
@@ -590,7 +581,7 @@ export const NEETCODE_PROBLEMS: NeetcodeProblem[] = [
     category: "Tries",
     difficulty: "Medium",
     leetcodeUrl: "https://leetcode.com/problems/design-add-and-search-words-data-structure/",
-    order: 62,
+    order: 61,
   },
   {
     id: "word-search-ii",
@@ -599,7 +590,7 @@ export const NEETCODE_PROBLEMS: NeetcodeProblem[] = [
     category: "Tries",
     difficulty: "Hard",
     leetcodeUrl: "https://leetcode.com/problems/word-search-ii/",
-    order: 63,
+    order: 62,
   },
   {
     id: "kth-largest-element-in-a-stream",
@@ -608,7 +599,7 @@ export const NEETCODE_PROBLEMS: NeetcodeProblem[] = [
     category: "Heap / Priority Queue",
     difficulty: "Easy",
     leetcodeUrl: "https://leetcode.com/problems/kth-largest-element-in-a-stream/",
-    order: 64,
+    order: 63,
   },
   {
     id: "last-stone-weight",
@@ -617,7 +608,7 @@ export const NEETCODE_PROBLEMS: NeetcodeProblem[] = [
     category: "Heap / Priority Queue",
     difficulty: "Easy",
     leetcodeUrl: "https://leetcode.com/problems/last-stone-weight/",
-    order: 65,
+    order: 64,
   },
   {
     id: "k-closest-points-to-origin",
@@ -626,7 +617,7 @@ export const NEETCODE_PROBLEMS: NeetcodeProblem[] = [
     category: "Heap / Priority Queue",
     difficulty: "Medium",
     leetcodeUrl: "https://leetcode.com/problems/k-closest-points-to-origin/",
-    order: 66,
+    order: 65,
   },
   {
     id: "kth-largest-element-in-an-array",
@@ -635,7 +626,7 @@ export const NEETCODE_PROBLEMS: NeetcodeProblem[] = [
     category: "Heap / Priority Queue",
     difficulty: "Medium",
     leetcodeUrl: "https://leetcode.com/problems/kth-largest-element-in-an-array/",
-    order: 67,
+    order: 66,
   },
   {
     id: "task-scheduler",
@@ -644,7 +635,7 @@ export const NEETCODE_PROBLEMS: NeetcodeProblem[] = [
     category: "Heap / Priority Queue",
     difficulty: "Medium",
     leetcodeUrl: "https://leetcode.com/problems/task-scheduler/",
-    order: 68,
+    order: 67,
   },
   {
     id: "design-twitter",
@@ -653,7 +644,7 @@ export const NEETCODE_PROBLEMS: NeetcodeProblem[] = [
     category: "Heap / Priority Queue",
     difficulty: "Medium",
     leetcodeUrl: "https://leetcode.com/problems/design-twitter/",
-    order: 69,
+    order: 68,
   },
   {
     id: "find-median-from-data-stream",
@@ -662,7 +653,7 @@ export const NEETCODE_PROBLEMS: NeetcodeProblem[] = [
     category: "Heap / Priority Queue",
     difficulty: "Hard",
     leetcodeUrl: "https://leetcode.com/problems/find-median-from-data-stream/",
-    order: 70,
+    order: 69,
   },
   {
     id: "subsets",
@@ -671,7 +662,7 @@ export const NEETCODE_PROBLEMS: NeetcodeProblem[] = [
     category: "Backtracking",
     difficulty: "Medium",
     leetcodeUrl: "https://leetcode.com/problems/subsets/",
-    order: 71,
+    order: 70,
   },
   {
     id: "combination-sum",
@@ -680,6 +671,15 @@ export const NEETCODE_PROBLEMS: NeetcodeProblem[] = [
     category: "Backtracking",
     difficulty: "Medium",
     leetcodeUrl: "https://leetcode.com/problems/combination-sum/",
+    order: 71,
+  },
+  {
+    id: "combination-sum-ii",
+    name: "Combination Sum II",
+    title: "Combination Sum II",
+    category: "Backtracking",
+    difficulty: "Medium",
+    leetcodeUrl: "https://leetcode.com/problems/combination-sum-ii/",
     order: 72,
   },
   {
@@ -701,12 +701,12 @@ export const NEETCODE_PROBLEMS: NeetcodeProblem[] = [
     order: 74,
   },
   {
-    id: "combination-sum-ii",
-    name: "Combination Sum II",
-    title: "Combination Sum II",
+    id: "generate-parentheses",
+    name: "Generate Parentheses",
+    title: "Generate Parentheses",
     category: "Backtracking",
     difficulty: "Medium",
-    leetcodeUrl: "https://leetcode.com/problems/combination-sum-ii/",
+    leetcodeUrl: "https://leetcode.com/problems/generate-parentheses/",
     order: 75,
   },
   {
